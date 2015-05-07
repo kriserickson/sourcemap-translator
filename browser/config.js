@@ -1,5 +1,5 @@
 System.config({
-  "baseURL": "C:\\Users\\kris\\AppData\\Roaming\\npm\\node_modules\\jspm\\lib\\config/",
+  "baseURL": "./",
   "transpiler": "babel",
   "babelOptions": {
     "optional": [
