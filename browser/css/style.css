@@ -1,7 +1,21 @@
 body {
   padding-top: 50px;
 }
-.starter-template {
+
+#minifier {
   padding: 40px 15px;
   text-align: center;
+}
+
+#minifier input {
+    width: calc(100% - 50px);
+}
+
+#minifier .well button {
+    float: right;
+    margin-top: -33px;
+}
+
+#buttonHolder {
+    text-align: center;
 }

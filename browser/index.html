@@ -18,40 +18,45 @@
     <nav class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
             <div class="navbar-header">
-                <!--          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">-->
-                <!--            <span class="sr-only">Toggle navigation</span>-->
-                <!--            <span class="icon-bar"></span>-->
-                <!--            <span class="icon-bar"></span>-->
-                <!--            <span class="icon-bar"></span>-->
-                <!--          </button>-->
+                          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                          </button>
                 <a class="navbar-brand" href="#">SourceMap Error Translator</a>
             </div>
-            <!--        <div id="navbar" class="collapse navbar-collapse">-->
-            <!--          <ul class="nav navbar-nav">-->
-            <!--            <li class="active"><a href="#">Home</a></li>-->
-            <!--            <li><a href="#about">About</a></li>-->
-            <!--            <li><a href="#contact">Contact</a></li>-->
-            <!--          </ul>-->
-            <!--        </div><!--/.nav-collapse -->-->
+            <div id="navbar" class="collapse navbar-collapse">
+                <ul  class="nav navbar-nav">
+                    <li id="pickSources" class="active"><a href="#"  ng-click="sourceMap.hideVisualizer()">Pick Sources</a></li>
+                    <li id="showVisualizer"><a href="#" ng-click="sourceMap.showVisualizer()" ng-disabled="!sourceMap.minifiedSource">View Visualizer</a></li>
+                </ul>
+            </div>
         </div>
     </nav>
 
     <div class="container">
-        <div class="starter-template">
-            <label>Minified Source File</label>
+        <div id="minifier" ng-if="!sourceMap.visualizerSelected">
+            <label for="minifiedFilename">Minified Source File</label>
             <div class="well">
-                <input class="form-control" type="text" ng-model="sourceMap.minifiedSourceFile">
-                <button class="btn btn-default" ng-click="getMinifiedJavascriptFile()">...</button>
+                <input id="minifiedFilename" class="form-control" type="text" ng-model="sourceMap.minifiedSourceFilename">
+                <button class="btn btn-default" ng-click="sourceMap.getMinifiedJavascriptFile()">...</button>
             </div>
 
-            <label>Source Map File</label>
+            <label for="sourceMap">Source Map File</label>
             <div class="well">
-                <input class="form-control" type="text" ng-model="sourceMap.sourceMapFile">
-                <button class="btn btn-default" ng-click="getSsourceMapFile()">...</button>
+                <input id="sourceMap" class="form-control" type="text" ng-model="sourceMap.sourceMapFilename">
+                <button class="btn btn-default" ng-click="sourceMap.getSourceMapFile()">...</button>
+            </div>
+
+            <div id="buttonHolder">
+	            <button class="btn btn-primary" ng-disabled="!sourceMap.minifiedSourceFilename || !sourceMap.sourceMapFilename" ng-click="sourceMap.showVisualizer()">Show Visualizer</button>
             </div>
 
         </div>
-
+        <div id="visualizer" ng-if="sourceMap.visualizerSelected">
+            <h1>Visualizer</h1>
+        </div>
     </div>
     <!-- /.container -->
 

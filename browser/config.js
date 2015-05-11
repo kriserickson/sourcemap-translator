@@ -1,5 +1,6 @@
 System.config({
-  "baseURL": "./",
+  //"baseURL": "./",
+  "baseURL": __dirname + "/",
   "transpiler": "babel",
   "babelOptions": {
     "optional": [

@@ -1,30 +1,37 @@
 'use strict';
+var ipc = require('ipc');
 
 class SourceMapCtrl {
-    constructor() {
-        this.minifiedSourceFile = '';
-        this.sourceMapFile = '';
-        this.testVal = 'Something';
-    }
-    getMinifiedJavascriptFile() {
-        console.log('getMinifiedJSFile');
-        dialog.showOpenDialog({
-            title: 'Select Minified Javascript File',
-            filters: [ {name: 'Javascript', extensions: ['js']}],
-            properties: ['openFile']
-        }, function(filename) {
-            this.minifiedSourceFile = filename;
+    constructor($scope) {
+        this.minifiedSourceFilename = '';
+        this.sourceMapFilename = '';
+        this.minifiedSource = false;
+        this.sourceMap = false;
+        this.currentGet = '';
+        ipc.on('get-file-results', (file) => {
+            if (this.currentGet === 'javascript') {
+                this.minifiedSourceFilename = file;
+            } else {
+                this.sourceMapFilename = file;
+            }
+            $scope.$apply();
         });
+    }
+
+    getMinifiedJavascriptFile() {
+        this.currentGet = 'javascript';
+        ipc.send('get-file', 'javascript');
     }
     getSourceMapFile() {
-        console.log('getSourceMapFile');
-        dialog.showOpenDialog({
-            title: 'Select Source Map File',
-            filters: [ {name: 'Source Map', extensions: ['map']}],
-            properties: ['openFile']
-        }, function(filename) {
-            this.sourceMapFile = filename;
-        });
+        this.currentGet = 'map';
+        ipc.send('get-file', 'map');
     }
+    showVisualizer() {
+        let res = ipc.sendSync('get-javascript-map');
+        this.sourceMap = res.map;
+        this.minifiedSource = res.script;
+        this.visualizerSelected = true;
+    }
+
 }
 export { SourceMapCtrl };
