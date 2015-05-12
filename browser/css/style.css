@@ -19,3 +19,13 @@ body {
 #buttonHolder {
     text-align: center;
 }
+
+
+.form-group {
+    text-align: left;
+    width: 49%;
+}
+
+#minifier .form-inline input, #minifier .form-inline label {
+    width: 49%;
+}

@@ -4,6 +4,7 @@ var app = require('app');
 var BrowserWindow = require('browser-window');
 var dialog = require('dialog');
 var fs = require('fs');
+var path = require('path');
 var javascriptFile = '';
 var mapFile = '';
 
@@ -30,31 +31,38 @@ app.on('ready', function () {
 });
 
 var ipc = require('ipc');
-ipc.on('get-file', function (event, arg) {
+
+ipc.on('get-file', function (event) {
     var openFileOptions = {
-        properties: ['openFile']
+        properties: ['openFile'],
+        title: 'Select Source Map File',
+        filters: [{ name: 'Source Map', extensions: ['map'] }]
     };
-    if (arg == 'javascript') {
-        openFileOptions.title = 'Select Minified Javascript File';
-        openFileOptions.filters = [{ name: 'Javascript', extensions: ['js'] }];
-    } else {
-        openFileOptions.title = 'Select Source Map File';
-        openFileOptions.filters = [{ name: 'Source Map', extensions: ['map'] }];
-    }
 
     dialog.showOpenDialog(openFileOptions, function (filename) {
-        filename = filename[0];
-        event.sender.send('get-file-results', filename);
-        fs.readFile(filename, function (err, data) {
-            if (arg == 'javscript') {
-                javascriptFile = data;
-            } else {
-                mapFile = data;
-            }
-        });
+        if (filename) {
+            filename = filename[0];
+            fs.readFile(filename, 'utf-8', function (err, data) {
+                if (err) {
+                    console.log('Error: ' + err);
+                } else {
+                    event.sender.send('get-file-results', { file: filename, map: data });
+                }
+            });
+        }
     });
 });
 
-ipc.on('get-javascript-map', function (event) {
-    event.returnValue = { map: mapFile, script: javascriptFile };
+ipc.on('get-source-file', function (event, args) {
+    var sourceFile = args[0];
+    var mapFilename = args[1];
+    var sourceDir = path.dirname(mapFilename);
+    var resovledPath = path.resolve(sourceDir, sourceFile);
+    fs.readFile(resovledPath, 'utf-8', function (err, data) {
+        if (err) {
+            console.log('Error: ' + err);
+        } else {
+            event.sender.send('get-source-file-result', data);
+        }
+    });
 });

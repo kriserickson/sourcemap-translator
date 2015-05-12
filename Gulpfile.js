@@ -14,4 +14,4 @@ gulp.task('run', ['default'], function() {
   return run('electron .').exec();
 });
 
-gulp.task('default', ['transpile-app']);
+gulp.task('default', ['transpile-app', 'run']);

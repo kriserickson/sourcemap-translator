@@ -2,6 +2,7 @@ let app = require('app');
 let BrowserWindow = require('browser-window');
 let dialog = require('dialog');
 let fs = require('fs');
+let path = require('path');
 let javascriptFile = '';
 let mapFile = '';
 
@@ -29,33 +30,40 @@ app.on('ready', () => {
 });
 
 let ipc = require('ipc');
-ipc.on('get-file', (event, arg) => {
-    let openFileOptions = {
-        properties: ['openFile']
-    };
-    if (arg == 'javascript') {
-        openFileOptions.title = 'Select Minified Javascript File';
-        openFileOptions.filters = [{name: 'Javascript', extensions: ['js']}];
-    } else {
-        openFileOptions.title = 'Select Source Map File';
-        openFileOptions.filters = [{name: 'Source Map', extensions: ['map']}];
-    }
 
-    dialog.showOpenDialog(openFileOptions, (filename) => {
-        filename = filename[0];
-        event.sender.send('get-file-results', filename);
-        fs.readFile(filename, (err, data) => {
-            if (arg == 'javscript') {
-                javascriptFile = data;
-            } else {
-                mapFile = data;
-            }
-        });
+ipc.on('get-file', (event) => {
+    let openFileOptions = {
+        properties: ['openFile'],
+        title: 'Select Source Map File',
+        filters: [{name: 'Source Map', extensions: ['map']}]
+    };
+
+    dialog.showOpenDialog(openFileOptions, function (filename) {
+        if (filename) {
+            filename = filename[0];
+            fs.readFile(filename, 'utf-8', function (err, data) {
+                if (err) {
+                    console.log('Error: ' + err);
+                } else {
+                    event.sender.send('get-file-results', {file: filename, map: data});
+                }
+            });
+        }
     });
 
 });
 
-ipc.on('get-javascript-map', (event) => {
-    event.returnValue = {map: mapFile, script: javascriptFile};
+ipc.on('get-source-file', (event, args) => {
+    let sourceFile = args[0];
+    let mapFilename = args[1];
+    let sourceDir = path.dirname(mapFilename);
+    let resovledPath = path.resolve(sourceDir, sourceFile);
+    fs.readFile(resovledPath, 'utf-8', function (err, data) {
+        if (err) {
+            console.log('Error: ' + err);
+        } else {
+            event.sender.send('get-source-file-result', data);
+        }
+    });
 });
 
