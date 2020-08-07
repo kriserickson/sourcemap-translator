@@ -1,14 +1,17 @@
 'use strict';
 
-var app = require('app');
-var BrowserWindow = require('browser-window');
-var dialog = require('dialog');
+const { app, BrowserWindow, dialog, crashReporter, ipcMain } = require('electron');
 var fs = require('fs');
 var path = require('path');
 var javascriptFile = '';
 var mapFile = '';
 
-require('crash-reporter').start();
+crashReporter.start({
+	companyName: "fooCorp",
+	submitURL: "https://0.0.0.0/",
+});
+
+app.allowRendererProcessReuse = true; // hide deprecation warning
 
 var mainWindow = null;
 
@@ -23,16 +26,14 @@ app.on('ready', function () {
         width: 800,
         height: 600
     });
-    mainWindow.loadUrl('file://' + __dirname + '/../browser/index.html');
+    mainWindow.loadURL('file://' + __dirname + '/../browser/index.html');
 
     mainWindow.on('closed', function () {
         mainWindow = null;
     });
 });
 
-var ipc = require('ipc');
-
-ipc.on('get-file', function (event) {
+ipcMain.on('get-file', function (event) {
     var openFileOptions = {
         properties: ['openFile'],
         title: 'Select Source Map File',
@@ -53,7 +54,7 @@ ipc.on('get-file', function (event) {
     });
 });
 
-ipc.on('get-source-file', function (event, args) {
+ipcMain.on('get-source-file', function (event, args) {
     var sourceFile = args[0];
     var mapFilename = args[1];
     var sourceDir = path.dirname(mapFilename);
